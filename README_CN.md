@@ -3,7 +3,6 @@
 [![Version](https://img.shields.io/badge/version-v2.0-blue.svg)](https://github.com/Stargazer-cc/MusicBeeQuickTag/releases)
 [![MusicBee](https://img.shields.io/badge/MusicBee-3.0%2B-orange.svg)](https://getmusicbee.com/)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
-[![Language](https://img.shields.io/badge/language-C%23-purple.svg)](https://docs.microsoft.com/en-us/dotnet/csharp/)
 
 一个 MusicBee 插件,用于快速浏览和应用音乐库中已存在的标签值。
 
@@ -49,18 +48,6 @@
     - **按住 Shift + 双击** 该值可将其 **添加** 到现有标签中（适用于流派或艺术家等多值字段）。
     - 插件会立即更新所有选中的歌曲。
     - 状态栏会显示确认信息。
-
----
-
-## 项目结构
-
-```
-├── MusicBeeInterface.cs         # MusicBee API 接口
-├── TagBrowserForm.cs            # 标签浏览器界面
-├── SettingsForm.cs              # 设置界面
-├── build.bat                    # 编译脚本
-└── readme.md                    # 说明文档
-```
 
 ---
 

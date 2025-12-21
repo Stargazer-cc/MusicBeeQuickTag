@@ -3,7 +3,6 @@
 [![Version](https://img.shields.io/badge/version-v2.0-blue.svg)](https://github.com/Stargazer-cc/MusicBeeQuickTag/releases)
 [![MusicBee](https://img.shields.io/badge/MusicBee-3.0%2B-orange.svg)](https://getmusicbee.com/)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
-[![Language](https://img.shields.io/badge/language-C%23-purple.svg)](https://docs.microsoft.com/en-us/dotnet/csharp/)
 
 **[中文文档](README_CN.md) | English**
 
@@ -54,19 +53,6 @@ Before using the tool, select which tag fields you want to manage:
 
 ---
 
-## 📁 Project Structure
-
-```
-├── Plugin.cs                    # Plugin entry point
-├── MusicBeeInterface.cs         # MusicBee API interface
-├── TagBrowserForm.cs            # Tag browser interface
-├── SettingsForm.cs              # Settings interface
-├── build.bat                    # Build script
-└── readme.md                    # Documentation
-```
-
----
-
 ## 📝 Version History
 
 **v2.0** (2025-11-28)
@@ -83,13 +69,3 @@ Before using the tool, select which tag fields you want to manage:
 ## 📄 License
 
 [MIT License](LICENSE)
-
----
-
-## 🌐 Language Support
-
-This plugin supports both English and Chinese interfaces:
-- **English** (Default)
-- **中文** (Chinese)
-
-For Chinese documentation, please refer to [README_CN.md](README_CN.md).
