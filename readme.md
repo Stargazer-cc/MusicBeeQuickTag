@@ -1,6 +1,6 @@
 # MusicBeeQuickTag
 
-[![Version](https://img.shields.io/badge/version-v2.0-blue.svg)](https://github.com/Stargazer-cc/MusicBeeQuickTag/releases)
+[![Version](https://img.shields.io/badge/version-V2.1.3-blue.svg)](https://github.com/Stargazer-cc/MusicBeeQuickTag/releases)
 [![MusicBee](https://img.shields.io/badge/MusicBee-3.0%2B-orange.svg)](https://getmusicbee.com/)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 
@@ -16,7 +16,9 @@ A MusicBee plugin for quickly browsing and applying existing tag values from you
 - **Custom Display Order**: Adjust field display order through a dual-list interface
 - **Column-based Layout**: All fields displayed side-by-side in one interface for easy viewing
 - **Real-time Track Monitoring**: Automatically detects track selection changes in MusicBee
-- **One-click Application**: Double-click any tag value to apply it to selected tracks
+- **Highlight Display**: Automatically highlights existing tags for selected tracks
+- **One-click Toggle**: Single-click any tag value to add or remove it
+- **Preset Groups**: Organize your tags into named groups for different genres or moods
 
 ---
 
@@ -46,14 +48,26 @@ Before using the tool, select which tag fields you want to manage:
    - The **Status Bar** at the top of the plugin window will update to show the number of selected files (e.g., "3 Files Selected") or the track details if only one is selected.
 3. **Apply a Value**:
    - Browse the columns to find the tag value you want to apply.
-   - **Double-click** the value to **replace** the existing tag.
-   - **Shift + Double-click** the value to **append** it to the existing tag (useful for multi-value fields like Genre or Artist).
+   - **Click** a value to **toggle** it:
+     - If the tag is missing, it will be **added** (appended).
+     - If the tag exists, it will be **removed**.
+     - Existing tags are shown in **Blue/Bold**.
    - The plugin will instantly update all selected tracks.
    - A confirmation message will appear in the status bar.
+
+### 3. Presets
+1. **Configure**: In Settings, use the "Preset Settings" tab to create groups and add frequent tag values.
+2. **Apply**: In the main tool window, select a group from the top-right dropdown, then click **Apply** to tag selected tracks with all presets in that group.
 
 ---
 
 ## 📝 Version History
+
+**V2.1.3** (2025-12-29)
+- Added support for multiple preset groups
+- A command to launch the plugin has been added to the toolbar configuration
+- Added display for tracks with tags already applied (Highlighting)
+- Optimized interaction: Single-click to Add/Remove tags
 
 **v2.0** (2025-11-28)
 - Dynamic scanning of all available fields

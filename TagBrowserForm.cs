@@ -13,21 +13,28 @@ namespace MusicBeePlugin
             private MusicBeeApiInterface mbApi;
             private string[] selectedFiles;
             private Dictionary<MetaDataType, HashSet<string>> tagValues;
+            private Dictionary<MetaDataType, HashSet<string>> selectedFileTags; // Feature 2: Track selected file tags
             private List<MetaDataType> fieldsToScan;
+            private List<PresetGroup> presetGroups; // Feature 5
+            private PresetGroup currentPresetGroup; // Feature 5
 
             private Label lblSelectedTrack;
             private TableLayoutPanel tableLayout;
             private Timer selectionTimer;
 
-            public TagBrowserForm(MusicBeeApiInterface api, string[] files, List<MetaDataType> fields)
+            public TagBrowserForm(MusicBeeApiInterface api, string[] files, List<MetaDataType> fields, List<PresetGroup> presets)
             {
                 mbApi = api;
                 selectedFiles = files;
                 fieldsToScan = fields;
+                presetGroups = presets; // Feature 5
+                if (presetGroups != null && presetGroups.Count > 0) currentPresetGroup = presetGroups[0];
                 tagValues = new Dictionary<MetaDataType, HashSet<string>>();
+                selectedFileTags = new Dictionary<MetaDataType, HashSet<string>>();
 
                 InitializeComponent();
                 ScanLibraryTags();
+                ScanSelectedTags(); // Init selected tags
                 PopulateColumns();
                 
                 selectionTimer = new Timer();
@@ -45,6 +52,8 @@ namespace MusicBeePlugin
                     {
                         selectedFiles = currentSelection;
                         UpdateSelectedTrackLabel();
+                        ScanSelectedTags(); // Refresh selected tags
+                        RefreshListBoxes(); // Force redraw of all listboxes
                     }
                 }
             }
@@ -80,15 +89,73 @@ namespace MusicBeePlugin
                 this.MinimumSize = new Size(900, 500);
                 this.BackColor = Color.FromArgb(245, 245, 245);
 
+                // Top Panel Container
+                Panel topPanel = new Panel();
+                topPanel.Dock = DockStyle.Top;
+                topPanel.Height = 50;
+                topPanel.BackColor = Color.FromArgb(50, 50, 50);
+                this.Controls.Add(topPanel);
+
+                // Label
                 lblSelectedTrack = new Label();
-                lblSelectedTrack.Dock = DockStyle.Top;
-                lblSelectedTrack.Height = 50;
+                lblSelectedTrack.Dock = DockStyle.Fill;
                 lblSelectedTrack.Font = new Font("Microsoft YaHei", 11, FontStyle.Bold);
                 lblSelectedTrack.TextAlign = ContentAlignment.MiddleLeft;
                 lblSelectedTrack.Padding = new Padding(20, 0, 20, 0);
-                lblSelectedTrack.BackColor = Color.FromArgb(50, 50, 50);
+                lblSelectedTrack.BackColor = Color.Transparent; // Using panel BG
                 lblSelectedTrack.ForeColor = Color.White;
-                this.Controls.Add(lblSelectedTrack);
+                topPanel.Controls.Add(lblSelectedTrack);
+
+                // Feature 5: Group Dropdown & Button
+                if (presetGroups != null && presetGroups.Count > 0)
+                {
+                    // Container Right
+                    FlowLayoutPanel flowRight = new FlowLayoutPanel();
+                    flowRight.Dock = DockStyle.Right;
+                    flowRight.AutoSize = true;
+                    flowRight.FlowDirection = FlowDirection.LeftToRight;
+                    flowRight.WrapContents = false;
+                    flowRight.Padding = new Padding(10, 8, 10, 0); // Top padding to center vertically
+                    flowRight.BackColor = Color.Transparent;
+
+                    Label lblGroup = new Label();
+                    lblGroup.Text = Localization.Get("Group"); // "Group:"
+                    lblGroup.ForeColor = Color.White;
+                    lblGroup.AutoSize = true;
+                    lblGroup.Margin = new Padding(0, 6, 5, 0); // Align text with combo
+                    flowRight.Controls.Add(lblGroup);
+
+                    ComboBox cbBrowserGroups = new ComboBox();
+                    cbBrowserGroups.DropDownStyle = ComboBoxStyle.DropDownList;
+                    cbBrowserGroups.Width = 100;
+                    cbBrowserGroups.FlatStyle = FlatStyle.Flat;
+                    foreach(var g in presetGroups) cbBrowserGroups.Items.Add(g.Name);
+                    cbBrowserGroups.SelectedIndex = 0;
+                    cbBrowserGroups.SelectedIndexChanged += (s, ev) => 
+                    {
+                        if (cbBrowserGroups.SelectedIndex >= 0) 
+                            currentPresetGroup = presetGroups[cbBrowserGroups.SelectedIndex];
+                    };
+                    flowRight.Controls.Add(cbBrowserGroups);
+
+                    Button btnApplyPresets = new Button();
+                    btnApplyPresets.Text = Localization.Get("ApplyShort"); // "Apply" - Shortened
+                    btnApplyPresets.AutoSize = true;
+                    btnApplyPresets.BackColor = Color.FromArgb(70, 70, 70);
+                    btnApplyPresets.ForeColor = Color.White;
+                    btnApplyPresets.FlatStyle = FlatStyle.Flat;
+                    btnApplyPresets.FlatAppearance.BorderSize = 0;
+                    btnApplyPresets.Click += BtnApplyPresets_Click;
+                    btnApplyPresets.Margin = new Padding(5, 0, 0, 0);
+                    
+                    flowRight.Controls.Add(btnApplyPresets);
+                    
+                    topPanel.Controls.Add(flowRight);
+                    flowRight.BringToFront();
+                    lblSelectedTrack.SendToBack();
+                }
+
+
 
                 tableLayout = new TableLayoutPanel();
                 tableLayout.Dock = DockStyle.Fill;
@@ -119,6 +186,70 @@ namespace MusicBeePlugin
                 {
                     lblSelectedTrack.Text = Localization.Get("FilesSelected", selectedFiles.Length);
                     lblSelectedTrack.ForeColor = Color.FromArgb(150, 255, 150);
+                }
+            }
+
+            private void ScanSelectedTags()
+            {
+                selectedFileTags.Clear();
+                foreach (var field in fieldsToScan)
+                {
+                    selectedFileTags[field] = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+                }
+
+                if (selectedFiles != null && selectedFiles.Length > 0)
+                {
+                    // 1. Get tags for first file
+                    Dictionary<MetaDataType, HashSet<string>> firstFileTags = new Dictionary<MetaDataType, HashSet<string>>();
+                    foreach (var field in fieldsToScan)
+                    {
+                        firstFileTags[field] = GetTagsForFile(selectedFiles[0], field);
+                    }
+
+                    // 2. Intersect with remaining files
+                    for (int i = 1; i < selectedFiles.Length; i++)
+                    {
+                        foreach (var field in fieldsToScan)
+                        {
+                            HashSet<string> currentTags = GetTagsForFile(selectedFiles[i], field);
+                            firstFileTags[field].IntersectWith(currentTags);
+                        }
+                    }
+
+                    // 3. Assign to result
+                    selectedFileTags = firstFileTags;
+                }
+            }
+
+            private HashSet<string> GetTagsForFile(string file, MetaDataType field)
+            {
+                HashSet<string> tags = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+                string value = mbApi.Library_GetFileTag(file, field);
+                if (!string.IsNullOrWhiteSpace(value))
+                {
+                    string[] values = value.Split(new char[] { ';', '\0' }, StringSplitOptions.RemoveEmptyEntries);
+                    foreach (string v in values)
+                    {
+                         tags.Add(v.Trim());
+                    }
+                }
+                return tags;
+            }
+
+            private void RefreshListBoxes()
+            {
+                foreach (Control c in tableLayout.Controls)
+                {
+                    if (c is Panel)
+                    {
+                        foreach (Control inner in c.Controls)
+                        {
+                            if (inner is ListBox)
+                            {
+                                inner.Invalidate();
+                            }
+                        }
+                    }
                 }
             }
 
@@ -236,14 +367,23 @@ namespace MusicBeePlugin
                     {
                         if (e.Index < 0) return;
                         
+                        string text = listBox.Items[e.Index].ToString();
+                        bool isTagPresent = selectedFileTags[field].Contains(text);
+
                         bool isSelected = (e.State & DrawItemState.Selected) == DrawItemState.Selected;
                         Color bgColor = isSelected ? Color.FromArgb(230, 240, 255) : Color.White;
                         Color textColor = isSelected ? Color.FromArgb(30, 30, 30) : Color.FromArgb(60, 60, 60);
                         
+                        // Highlight logic
+                        if (isTagPresent)
+                        {
+                            textColor = Color.Blue; 
+                        }
+
                         e.Graphics.FillRectangle(new SolidBrush(bgColor), e.Bounds);
                         
-                        string text = listBox.Items[e.Index].ToString();
-                        e.Graphics.DrawString(text, e.Font, new SolidBrush(textColor), 
+                        Font font = isTagPresent ? new Font(e.Font, FontStyle.Bold) : e.Font;
+                        e.Graphics.DrawString(text, font, new SolidBrush(textColor), 
                             e.Bounds.Left + 12, e.Bounds.Top + 6);
                     };
 
@@ -254,12 +394,26 @@ namespace MusicBeePlugin
                     }
 
                     MetaDataType currentField = field;
-                    listBox.DoubleClick += (s, e) =>
+                    listBox.MouseClick += (s, e) =>
                     {
-                        if (listBox.SelectedItem != null)
+                        int index = listBox.IndexFromPoint(e.Location);
+                        if (index != ListBox.NoMatches)
                         {
-                            bool append = (Control.ModifierKeys & Keys.Shift) == Keys.Shift;
-                            ApplyTag(currentField, listBox.SelectedItem.ToString(), append);
+                            string value = listBox.Items[index].ToString();
+                            bool isPresent = selectedFileTags[currentField].Contains(value);
+                            
+                            if (isPresent)
+                            {
+                                RemoveTag(currentField, value);
+                            }
+                            else
+                            {
+                                ApplyTag(currentField, value, true);
+                            }
+                            
+                            // Immediately refresh highlights
+                            ScanSelectedTags();
+                            listBox.Invalidate(listBox.GetItemRectangle(index));
                         }
                     };
 
@@ -344,6 +498,75 @@ namespace MusicBeePlugin
                 };
                 resetTimer.Start();
             }
+
+
+            private void RemoveTag(MetaDataType field, string valueToRemove)
+            {
+                 if (selectedFiles == null || selectedFiles.Length == 0) return;
+
+                 foreach (string file in selectedFiles)
+                 {
+                     string currentValue = mbApi.Library_GetFileTag(file, field);
+                     if (!string.IsNullOrWhiteSpace(currentValue))
+                     {
+                         var values = currentValue.Split(new char[] { ';', '\0' }, StringSplitOptions.RemoveEmptyEntries).Select(v => v.Trim()).ToList();
+                         if (values.RemoveAll(v => v.Equals(valueToRemove, StringComparison.OrdinalIgnoreCase)) > 0)
+                         {
+                             string newValue = string.Join("; ", values);
+                             mbApi.Library_SetFileTag(file, field, newValue);
+                             mbApi.Library_CommitTagsToFile(file);
+                         }
+                     }
+                 }
+                 mbApi.MB_RefreshPanels();
+                 lblSelectedTrack.Text = Localization.Get("TagRemoved", valueToRemove);
+                 // Note: ScanSelectedTags updated by caller
+            }
+
+            private void BtnApplyPresets_Click(object sender, EventArgs e)
+            {
+                if (selectedFiles == null || selectedFiles.Length == 0)
+                {
+                    MessageBox.Show(Localization.Get("SelectFilesFirst"), Localization.Get("Info"), MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    return;
+                }
+
+                // Use currentPresetGroup
+                if (currentPresetGroup == null || currentPresetGroup.Tags.Count == 0) return;
+
+                foreach (string preset in currentPresetGroup.Tags)
+                {
+                    string[] parts = preset.Split(new char[] { ':' }, 2);
+                    if (parts.Length == 2)
+                    {
+                        string fieldName = parts[0].Trim();
+                        string value = parts[1].Trim();
+                        
+                        // Find MetaDataType from name
+                        MetaDataType field = MetaDataType.Comment; // Default
+                        bool found = false;
+                        foreach(MetaDataType type in Enum.GetValues(typeof(MetaDataType)))
+                        {
+                             if (type.ToString().Equals(fieldName, StringComparison.OrdinalIgnoreCase))
+                             {
+                                 field = type;
+                                 found = true;
+                                 break;
+                             }
+                        }
+
+                        if (found)
+                        {
+                            ApplyTag(field, value, true);
+                        }
+                    }
+                }
+                
+                lblSelectedTrack.Text = Localization.Get("PresetsApplied", selectedFiles.Length);
+                ScanSelectedTags();
+                RefreshListBoxes();
+            }
+
         }
     }
 }

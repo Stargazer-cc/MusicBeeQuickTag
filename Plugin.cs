@@ -9,28 +9,43 @@ namespace MusicBeePlugin
     public partial class Plugin
     {
         private MusicBeeApiInterface mbApiInterface;
-        private PluginInfo about = new PluginInfo();
+        private PluginInfo about;
 
         public PluginInfo Initialise(IntPtr apiInterfacePtr)
         {
-            mbApiInterface = new MusicBeeApiInterface();
-            mbApiInterface.Initialise(apiInterfacePtr);
+            try
+            {
+                about = new PluginInfo();
+                mbApiInterface = new MusicBeeApiInterface();
+                mbApiInterface.Initialise(apiInterfacePtr);
 
-            about.PluginInfoVersion = 1;
-            about.Name = "MusicBeeQuickTag";
-            about.Description = Localization.Get("PluginDescription");
-            about.Author = "Stargazer-cc";
-            about.TargetApplication = "";
-            about.Type = PluginType.General;
-            about.VersionMajor = 2;
-            about.VersionMinor = 0;
-            about.Revision = 0;
-            about.MinInterfaceVersion = 20;
-            about.MinApiRevision = 35;
-            about.ReceiveNotifications = (ReceiveNotificationFlags.StartupOnly);
-            about.ConfigurationPanelHeight = 0;
+                about.PluginInfoVersion = 1;
+                about.Name = "MusicBeeQuickTag";
+                about.Description = Localization.Get("PluginDescription");
+                about.Author = "Stargazer-cc";
+                about.TargetApplication = "";
+                about.Type = PluginType.General;
+                about.VersionMajor = 2;
+                about.VersionMinor = 1;
+                about.Revision = 3;
+                about.MinInterfaceVersion = 20;
+                about.MinApiRevision = 35;
+                about.ReceiveNotifications = (ReceiveNotificationFlags.StartupOnly);
+                about.ConfigurationPanelHeight = 0;
 
-            return about;
+                return about;
+            }
+            catch (Exception ex)
+            {
+                // Try to log to a file
+                try
+                {
+                    string logPath = System.IO.Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Desktop), "MB_ErrorLog.txt");
+                    System.IO.File.WriteAllText(logPath, "Initialise Error: " + ex.ToString());
+                }
+                catch { }
+                throw; // Re-throw to show error in MB
+            }
         }
 
         public bool Configure(IntPtr panelHandle)
@@ -71,6 +86,7 @@ namespace MusicBeePlugin
             {
                 case NotificationType.PluginStartup:
                     mbApiInterface.MB_AddMenuItem("mnuTools/MusicBeeQuickTag", null, OnQuickTagBrowser);
+                    mbApiInterface.MB_RegisterCommand("MusicBeeQuickTag: Open Browser", OnQuickTagBrowser);
                     break;
             }
         }
@@ -86,9 +102,11 @@ namespace MusicBeePlugin
                 // Load field settings
                 string storagePath = mbApiInterface.Setting_GetPersistentStoragePath();
                 List<MetaDataType> fieldsToScan = SettingsForm.LoadSettings(storagePath);
+                string presetsPath = System.IO.Path.Combine(storagePath, "MusicBeeQuickTag_Presets.txt");
+                List<PresetGroup> presets = PresetManager.Load(presetsPath);
 
                 // Show browser form (modeless)
-                TagBrowserForm form = new TagBrowserForm(mbApiInterface, selectedFiles, fieldsToScan);
+                TagBrowserForm form = new TagBrowserForm(mbApiInterface, selectedFiles, fieldsToScan, presets);
                 form.Show();
             }
             catch (Exception ex)

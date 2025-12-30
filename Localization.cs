@@ -32,7 +32,8 @@ namespace MusicBeePlugin
             zhCN.Add("Error", "错误");
             
             // SettingsForm.cs
-            zhCN.Add("SettingsTitle", "MusicBeeQuickTag - 字段设置");
+            zhCN.Add("SettingsTitle", "MusicBeeQuickTag设置");
+            zhCN.Add("FieldsSettings", "字段设置");
             zhCN.Add("SettingsInfo", "选择要在 Tag Browser 中显示的字段。右侧列表的顺序决定了显示时的列顺序。");
             zhCN.Add("Scanning", "正在扫描音乐库...");
             zhCN.Add("AvailableFields", "可用字段:");
@@ -44,15 +45,33 @@ namespace MusicBeePlugin
             zhCN.Add("SelectAtLeastOne", "请至少选择一个字段！");
             zhCN.Add("Warning", "提示");
             zhCN.Add("SaveFailed", "保存设置失败: ");
+            zhCN.Add("PresetSettings", "预设标签设置");
+            zhCN.Add("PresetInfo", "选择预设组，或者创建新组。在下方输入标签内容（字段:值）。");
+            zhCN.Add("AddToPresets", "添加到当前组");
+            zhCN.Add("Add", "添加");
+            zhCN.Add("Group", "预设标签组:");
+            zhCN.Add("NewGroup", "新建组");
+            zhCN.Add("DeleteGroup", "删除组");
+            zhCN.Add("SavePresets", "保存预设");
+            zhCN.Add("DefaultGroup", "默认组");
+            zhCN.Add("ConfirmDelete", "确定要删除预设组 '{0}' 吗？");
+            zhCN.Add("EnterGroupName", "请输入新组名称:");
+            zhCN.Add("GroupExists", "该组名已存在！");
+            zhCN.Add("ApplyShort", "应用");
+
             
             // TagBrowserForm.cs
-            zhCN.Add("BrowserTitle", "MusicBeeQuickTag v2.0");
+            zhCN.Add("BrowserTitle", "MusicBeeQuickTag V2.1.3");
             zhCN.Add("NoFileSelected", "未选择任何文件");
             zhCN.Add("FilesSelected", "已选中 {0} 个文件");
             zhCN.Add("NoFieldsFound", "没有找到任何标签数据\n\n请先在设置中选择要显示的字段");
             zhCN.Add("AppliedTag", "✓ 已应用 '{0}' 到 {1} 字段 ({2} 个文件)");
             zhCN.Add("SelectFilesFirst", "请先选择音乐文件");
             zhCN.Add("Info", "提示");
+            zhCN.Add("ApplyPresets", "应用预设标签");
+            zhCN.Add("PresetsApplied", "已应用预设标签到 {0} 个文件");
+            zhCN.Add("TagRemoved", "已移除标签值: {0}");
+            zhCN.Add("TagAdded", "已添加标签值: {0}");
             
             translations.Add("zh-CN", zhCN);
 
@@ -65,7 +84,8 @@ namespace MusicBeePlugin
             enUS.Add("Error", "Error");
             
             // SettingsForm.cs
-            enUS.Add("SettingsTitle", "MusicBeeQuickTag - Field Settings");
+            enUS.Add("SettingsTitle", "MusicBeeQuickTag Settings");
+            enUS.Add("FieldsSettings", "Field Settings");
             enUS.Add("SettingsInfo", "Select fields to display in Tag Browser. The order in the right list determines the column order.");
             enUS.Add("Scanning", "Scanning music library...");
             enUS.Add("AvailableFields", "Available Fields:");
@@ -77,15 +97,33 @@ namespace MusicBeePlugin
             enUS.Add("SelectAtLeastOne", "Please select at least one field!");
             enUS.Add("Warning", "Warning");
             enUS.Add("SaveFailed", "Failed to save settings: ");
+            enUS.Add("PresetSettings", "Preset Tag Settings");
+            enUS.Add("PresetInfo", "Select a preset group or create a new one. Enter tags below (Field:Value).");
+            enUS.Add("AddToPresets", "Add to Current Group");
+            enUS.Add("Add", "Add");
+            enUS.Add("Group", "Preset Tag Group:");
+            enUS.Add("NewGroup", "New Group");
+            enUS.Add("DeleteGroup", "Delete Group");
+            enUS.Add("SavePresets", "Save Presets");
+            enUS.Add("DefaultGroup", "Default");
+            enUS.Add("ConfirmDelete", "Are you sure you want to delete group '{0}'?");
+            enUS.Add("EnterGroupName", "Enter new group name:");
+            enUS.Add("GroupExists", "Group name already exists!");
+            enUS.Add("ApplyShort", "Apply");
+
             
             // TagBrowserForm.cs
-            enUS.Add("BrowserTitle", "MusicBeeQuickTag v2.0");
+            enUS.Add("BrowserTitle", "MusicBeeQuickTag V2.1.3");
             enUS.Add("NoFileSelected", "No files selected");
             enUS.Add("FilesSelected", "{0} files selected");
             enUS.Add("NoFieldsFound", "No tag data found\n\nPlease select fields to display in settings");
             enUS.Add("AppliedTag", "✓ Applied '{0}' to {1} field ({2} files)");
             enUS.Add("SelectFilesFirst", "Please select music files first");
             enUS.Add("Info", "Info");
+            enUS.Add("ApplyPresets", "Apply Presets");
+            enUS.Add("PresetsApplied", "Applied presets to {0} files");
+            enUS.Add("TagRemoved", "Removed tag value: {0}");
+            enUS.Add("TagAdded", "Added tag value: {0}");
             
             translations.Add("en-US", enUS);
         }

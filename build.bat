@@ -30,7 +30,7 @@ echo [信息] 正在编译...
 echo.
 
 :: Compile command
-%CSC% /target:library /out:mb_MusicBeeQuickTag.dll /reference:System.Windows.Forms.dll /reference:System.Drawing.dll /reference:System.Core.dll /reference:System.Data.dll Plugin.cs MusicBeeInterface.cs TagBrowserForm.cs SettingsForm.cs Localization.cs
+%csc% /target:library /out:mb_MusicBeeQuickTag.dll /debug:full /optimize- /r:System.Windows.Forms.dll /r:System.Drawing.dll /r:System.dll /r:System.Core.dll Plugin.cs MusicBeeInterface.cs TagBrowserForm.cs SettingsForm.cs Localization.cs PresetManager.cs
 
 if %errorlevel% neq 0 (
     echo.
