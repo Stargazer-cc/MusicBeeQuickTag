@@ -19,6 +19,7 @@ namespace MusicBeePlugin
             private PresetGroup currentPresetGroup; // Feature 5
 
             private Label lblSelectedTrack;
+            private Label lblStatus; // Feature 6
             private TableLayoutPanel tableLayout;
             private Timer selectionTimer;
 
@@ -90,21 +91,40 @@ namespace MusicBeePlugin
                 this.BackColor = Color.FromArgb(245, 245, 245);
 
                 // Top Panel Container
+                // Top Panel Container
                 Panel topPanel = new Panel();
                 topPanel.Dock = DockStyle.Top;
-                topPanel.Height = 50;
+                topPanel.Height = 70; // Increased height for two rows
                 topPanel.BackColor = Color.FromArgb(50, 50, 50);
                 this.Controls.Add(topPanel);
 
-                // Label
+                // Row 1: Selected Track Label
                 lblSelectedTrack = new Label();
-                lblSelectedTrack.Dock = DockStyle.Fill;
+                lblSelectedTrack.Dock = DockStyle.Top;
+                lblSelectedTrack.Height = 35;
                 lblSelectedTrack.Font = new Font("Microsoft YaHei", 11, FontStyle.Bold);
-                lblSelectedTrack.TextAlign = ContentAlignment.MiddleLeft;
-                lblSelectedTrack.Padding = new Padding(20, 0, 20, 0);
-                lblSelectedTrack.BackColor = Color.Transparent; // Using panel BG
+                lblSelectedTrack.TextAlign = ContentAlignment.BottomLeft;
+                lblSelectedTrack.Padding = new Padding(20, 0, 0, 5);
+                lblSelectedTrack.BackColor = Color.Transparent;
                 lblSelectedTrack.ForeColor = Color.White;
                 topPanel.Controls.Add(lblSelectedTrack);
+
+                // Row 2: Action Row (Status + Buttons)
+                Panel pnlActionRow = new Panel();
+                pnlActionRow.Dock = DockStyle.Fill;
+                pnlActionRow.BackColor = Color.Transparent;
+                pnlActionRow.Padding = new Padding(20, 0, 20, 0);
+                topPanel.Controls.Add(pnlActionRow);
+                pnlActionRow.BringToFront();
+
+                // Status Label (Left)
+                lblStatus = new Label();
+                lblStatus.Dock = DockStyle.Fill;
+                lblStatus.TextAlign = ContentAlignment.MiddleLeft;
+                lblStatus.ForeColor = Color.LightGray;
+                lblStatus.Font = new Font("Microsoft YaHei", 9, FontStyle.Regular);
+                lblStatus.Text = ""; 
+                pnlActionRow.Controls.Add(lblStatus);
 
                 // Feature 5: Group Dropdown & Button
                 if (presetGroups != null && presetGroups.Count > 0)
@@ -115,7 +135,7 @@ namespace MusicBeePlugin
                     flowRight.AutoSize = true;
                     flowRight.FlowDirection = FlowDirection.LeftToRight;
                     flowRight.WrapContents = false;
-                    flowRight.Padding = new Padding(10, 8, 10, 0); // Top padding to center vertically
+                    flowRight.Padding = new Padding(0, 4, 0, 0); 
                     flowRight.BackColor = Color.Transparent;
 
                     Label lblGroup = new Label();
@@ -150,9 +170,9 @@ namespace MusicBeePlugin
                     
                     flowRight.Controls.Add(btnApplyPresets);
                     
-                    topPanel.Controls.Add(flowRight);
-                    flowRight.BringToFront();
-                    lblSelectedTrack.SendToBack();
+                    pnlActionRow.Controls.Add(flowRight);
+                    // flowRight.BringToFront(); // Not needed as it's docked Right
+                    // lblSelectedTrack.SendToBack();
                 }
 
 
@@ -394,7 +414,7 @@ namespace MusicBeePlugin
                     }
 
                     MetaDataType currentField = field;
-                    listBox.MouseClick += (s, e) =>
+                    listBox.MouseDoubleClick += (s, e) =>
                     {
                         int index = listBox.IndexFromPoint(e.Location);
                         if (index != ListBox.NoMatches)
@@ -430,8 +450,10 @@ namespace MusicBeePlugin
                     return;
                 }
 
+                string valueToAdd = value; // Preserve original for status
                 foreach (string file in selectedFiles)
                 {
+                    string newValue = value; // Local var for modification
                     if (append)
                     {
                         string currentValue = mbApi.Library_GetFileTag(file, field);
@@ -451,7 +473,7 @@ namespace MusicBeePlugin
 
                             if (!exists)
                             {
-                                value = currentValue + "; " + value;
+                                newValue = currentValue + "; " + value;
                             }
                             else
                             {
@@ -461,7 +483,7 @@ namespace MusicBeePlugin
                         }
                     }
 
-                    mbApi.Library_SetFileTag(file, field, value);
+                    mbApi.Library_SetFileTag(file, field, newValue);
                     mbApi.Library_CommitTagsToFile(file);
                 }
                 mbApi.MB_RefreshPanels();
@@ -480,23 +502,16 @@ namespace MusicBeePlugin
                 // Wait, I see `Localization.Get` calls. I should probably check if I can add keys.
                 // But for now, I'll just change the message logic slightly.
                 
-                lblSelectedTrack.Text = string.Format("{0}: {1} -> {2} ({3})", 
-                    append ? "Added" : "Applied", 
-                    value, 
-                    fieldName, 
-                    selectedFiles.Length);
-
-                lblSelectedTrack.ForeColor = Color.FromArgb(150, 255, 150);
-                
-                Timer resetTimer = new Timer();
-                resetTimer.Interval = 2000;
-                resetTimer.Tick += (s, e) =>
+                // Feature 6: Status Update
+                if (lblStatus != null)
                 {
-                    UpdateSelectedTrackLabel();
-                    resetTimer.Stop();
-                    resetTimer.Dispose();
-                };
-                resetTimer.Start();
+                    string action = append ? "Added" : "Set"; // Consider localizing later if needed
+                    lblStatus.Text = string.Format("✓ {0}: {1}", action, valueToAdd);
+                    lblStatus.ForeColor = Color.FromArgb(120, 255, 120); // Light Green
+                }
+                
+                // Refresh label
+                UpdateSelectedTrackLabel();
             }
 
 
@@ -519,8 +534,15 @@ namespace MusicBeePlugin
                      }
                  }
                  mbApi.MB_RefreshPanels();
-                 lblSelectedTrack.Text = Localization.Get("TagRemoved", valueToRemove);
-                 // Note: ScanSelectedTags updated by caller
+                
+                // Feature 6: Status Update
+                if (lblStatus != null)
+                {
+                     lblStatus.Text = string.Format("✗ Removed: {0}", valueToRemove);
+                     lblStatus.ForeColor = Color.FromArgb(255, 150, 150); // Light Red
+                }
+
+                UpdateSelectedTrackLabel();
             }
 
             private void BtnApplyPresets_Click(object sender, EventArgs e)
@@ -562,7 +584,11 @@ namespace MusicBeePlugin
                     }
                 }
                 
-                lblSelectedTrack.Text = Localization.Get("PresetsApplied", selectedFiles.Length);
+                if (lblStatus != null)
+                {
+                    lblStatus.Text = string.Format("✓ {0}", Localization.Get("PresetsApplied", selectedFiles.Length));
+                    lblStatus.ForeColor = Color.FromArgb(120, 255, 120);
+                }
                 ScanSelectedTags();
                 RefreshListBoxes();
             }
