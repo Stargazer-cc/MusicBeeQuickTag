@@ -48,7 +48,7 @@ Before using the tool, select which tag fields you want to manage:
    - The **Status Bar** at the top of the plugin window will update to show the number of selected files (e.g., "3 Files Selected") or the track details if only one is selected.
 3. **Apply a Value**:
    - Browse the columns to find the tag value you want to apply.
-   - **Click** a value to **toggle** it:
+   - **Double Click** a value to **toggle** it:
      - If the tag is missing, it will be **added** (appended).
      - If the tag exists, it will be **removed**.
      - Existing tags are shown in **Blue/Bold**.
