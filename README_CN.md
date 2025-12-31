@@ -1,6 +1,6 @@
 # MusicBeeQuickTag
 
-[![Version](https://img.shields.io/badge/version-V2.1.3-blue.svg)](https://github.com/Stargazer-cc/MusicBeeQuickTag/releases)
+[![Version](https://img.shields.io/badge/version-V2.1.4-blue.svg)](https://github.com/Stargazer-cc/MusicBeeQuickTag/releases)
 [![MusicBee](https://img.shields.io/badge/MusicBee-3.0%2B-orange.svg)](https://getmusicbee.com/)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 
@@ -61,7 +61,7 @@
 
 ## 版本历史
 
-**V2.1.3** (2025-12-29)
+**V2.1.4** (2025-12-29)
 - 支持多组预设管理
 - 已向工具栏配置中添加了启动插件的命令
 - 增添了歌曲已添加标签的显示

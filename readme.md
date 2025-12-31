@@ -1,6 +1,6 @@
 # MusicBeeQuickTag
 
-[![Version](https://img.shields.io/badge/version-V2.1.3-blue.svg)](https://github.com/Stargazer-cc/MusicBeeQuickTag/releases)
+[![Version](https://img.shields.io/badge/version-V2.1.4-blue.svg)](https://github.com/Stargazer-cc/MusicBeeQuickTag/releases)
 [![MusicBee](https://img.shields.io/badge/MusicBee-3.0%2B-orange.svg)](https://getmusicbee.com/)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 
@@ -63,7 +63,7 @@ Before using the tool, select which tag fields you want to manage:
 
 ## 📝 Version History
 
-**V2.1.3** (2025-12-29)
+**V2.1.4** (2025-12-29)
 - Added support for multiple preset groups
 - A command to launch the plugin has been added to the toolbar configuration
 - Added display for tracks with tags already applied (Highlighting)

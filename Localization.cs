@@ -61,7 +61,7 @@ namespace MusicBeePlugin
 
             
             // TagBrowserForm.cs
-            zhCN.Add("BrowserTitle", "MusicBeeQuickTag V2.1.3");
+            zhCN.Add("BrowserTitle", "MusicBeeQuickTag V2.1.4");
             zhCN.Add("NoFileSelected", "未选择任何文件");
             zhCN.Add("FilesSelected", "已选中 {0} 个文件");
             zhCN.Add("NoFieldsFound", "没有找到任何标签数据\n\n请先在设置中选择要显示的字段");
@@ -113,7 +113,7 @@ namespace MusicBeePlugin
 
             
             // TagBrowserForm.cs
-            enUS.Add("BrowserTitle", "MusicBeeQuickTag V2.1.3");
+            enUS.Add("BrowserTitle", "MusicBeeQuickTag V2.1.4");
             enUS.Add("NoFileSelected", "No files selected");
             enUS.Add("FilesSelected", "{0} files selected");
             enUS.Add("NoFieldsFound", "No tag data found\n\nPlease select fields to display in settings");
