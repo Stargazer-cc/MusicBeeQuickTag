@@ -21,6 +21,7 @@ namespace MusicBeePlugin
             private Label lblSelectedTrack;
             private Label lblStatus; // Feature 6
             private TableLayoutPanel tableLayout;
+            private TableLayoutPanel footerPanel;  // Independent footer panel for column headers
             private Timer selectionTimer;
 
             public TagBrowserForm(MusicBeeApiInterface api, string[] files, List<MetaDataType> fields, List<PresetGroup> presets)
@@ -177,6 +178,14 @@ namespace MusicBeePlugin
 
 
 
+                // Footer panel for column headers - independent from list content
+                footerPanel = new TableLayoutPanel();
+                footerPanel.Dock = DockStyle.Bottom;
+                footerPanel.Height = 45;
+                footerPanel.Padding = new Padding(10, 0, 10, 0);  // Match tableLayout horizontal padding
+                footerPanel.Margin = new Padding(0);
+                this.Controls.Add(footerPanel);
+
                 tableLayout = new TableLayoutPanel();
                 tableLayout.Dock = DockStyle.Fill;
                 tableLayout.AutoScroll = true;
@@ -328,11 +337,20 @@ namespace MusicBeePlugin
                     return;
                 }
 
+                // Setup tableLayout columns
                 tableLayout.RowCount = 1;
                 tableLayout.ColumnCount = fieldsWithData.Count;
                 for (int i = 0; i < fieldsWithData.Count; i++)
                 {
                     tableLayout.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100f / fieldsWithData.Count));
+                }
+
+                // Setup footerPanel columns to match tableLayout
+                footerPanel.RowCount = 1;
+                footerPanel.ColumnCount = fieldsWithData.Count;
+                for (int i = 0; i < fieldsWithData.Count; i++)
+                {
+                    footerPanel.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100f / fieldsWithData.Count));
                 }
 
                 Color[] headerColors = new Color[]
@@ -353,25 +371,26 @@ namespace MusicBeePlugin
                         fieldName = field.ToString();
                     }
 
+                    Color headerColor = headerColors[col % headerColors.Length];
+
+                    // Create footer label in independent footerPanel
+                    Label footerLabel = new Label();
+                    footerLabel.Text = string.Format("{0} ({1})", fieldName, tagValues[field].Count);
+                    footerLabel.Dock = DockStyle.Fill;
+                    footerLabel.Font = new Font(SystemFonts.DefaultFont.FontFamily, 11, FontStyle.Bold);
+                    footerLabel.TextAlign = ContentAlignment.MiddleCenter;
+                    footerLabel.ForeColor = Color.White;
+                    footerLabel.BackColor = headerColor;
+                    footerLabel.Margin = new Padding(5, 0, 5, 0);  // Match containerPanel horizontal margin
+                    footerPanel.Controls.Add(footerLabel, col, 0);
+
+                    // Container panel for ListBox only (no footer inside)
                     Panel containerPanel = new Panel();
                     containerPanel.Dock = DockStyle.Fill;
                     containerPanel.Margin = new Padding(5, 70, 5, 5);  // Left, Top, Right, Bottom
                     containerPanel.BackColor = Color.White;
 
-                    Color headerColor = headerColors[col % headerColors.Length];
-
-                    // Footer label at bottom
-                    Label footerLabel = new Label();
-                    footerLabel.Text = string.Format("{0} ({1})", fieldName, tagValues[field].Count);
-                    footerLabel.Dock = DockStyle.Bottom;
-                    footerLabel.Height = 45;
-                    footerLabel.Font = new Font(SystemFonts.DefaultFont.FontFamily, 11, FontStyle.Bold);
-                    footerLabel.TextAlign = ContentAlignment.MiddleCenter;
-                    footerLabel.ForeColor = Color.White;
-                    footerLabel.BackColor = headerColor;
-                    containerPanel.Controls.Add(footerLabel);
-
-                    // ListBox fills remaining space
+                    // ListBox fills the entire container
                     ListBox listBox = new ListBox();
                     listBox.Dock = DockStyle.Fill;
                     listBox.Font = new Font(SystemFonts.DefaultFont.FontFamily, 10);
@@ -381,7 +400,6 @@ namespace MusicBeePlugin
                     listBox.ForeColor = Color.FromArgb(60, 60, 60);
                     listBox.ItemHeight = 28;
                     listBox.DrawMode = DrawMode.OwnerDrawFixed;
-                    listBox.Padding = new Padding(0, 20, 0, 0);  // Add top padding
                     
                     listBox.DrawItem += (s, e) =>
                     {
